@@ -1,0 +1,19 @@
+{
+    "name": "playwright",
+    "version": "1.0.0",
+    "description": "",
+    "main": "index.js",
+    "scripts": {
+        "test": "npx playwright test ",
+        "test-ui": "npx playwright test --ui",
+        "test-headed": "npx playwright test --headed",
+        "test-ui-headed": "npx playwright test --ui --headed"
+    },
+    "keywords": [],
+    "author": "Szymon Zimończyk",
+    "license": "ISC",
+    "devDependencies": {
+        "@playwright/test": "^1.37.1",
+        "prettier": "3.0.3"
+    }
+}
