@@ -21,6 +21,13 @@ pipeline {
             }
         }
 
+        stage('Install Playwright system dependencies') {
+            steps {
+                // Ensure the required system dependencies are installed
+                sh 'sudo npx playwright install-deps'
+            }
+        }
+
         stage('Run Playwright tests') {
             steps {
                 sh 'npm test'
