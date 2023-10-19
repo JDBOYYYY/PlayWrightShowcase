@@ -18,7 +18,7 @@ pipeline {
                                        -v $(pwd):/workspace \
                                        -w /workspace \
                                        mcr.microsoft.com/playwright:v1.39.0-jammy \
-                                       bash -c "npm install && npm test"
+                                       bash -c "npm install && npm test --trace on"
                         '''
                     } catch (Exception e) {
                         currentBuild.result = 'UNSTABLE'
