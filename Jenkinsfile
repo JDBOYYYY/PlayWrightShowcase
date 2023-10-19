@@ -4,7 +4,6 @@ pipeline {
     stages {
         stage('Checkout') {
             steps {
-                // This step is handled automatically when using "Pipeline script from SCM"
                 checkout scm
             }
         }
@@ -15,22 +14,16 @@ pipeline {
             }
         }
 
-        stage('Install Playwright browsers') {
+        stage('Run Playwright tests in Docker') {
             steps {
-                sh 'npx playwright install'
-            }
-        }
-
-        stage('Install Playwright system dependencies') {
-            steps {
-                // Ensure the required system dependencies are installed
-                sh 'sudo npx playwright install-deps'
-            }
-        }
-
-        stage('Run Playwright tests') {
-            steps {
-                sh 'npm test'
+                sh '''
+                    docker run --rm \
+                               --ipc=host \
+                               -v $(pwd):/workspace \
+                               -w /workspace \
+                               mcr.microsoft.com/playwright:v1.39.0-jammy \
+                               bash -c "npm test"
+                '''
             }
         }
     }
