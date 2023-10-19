@@ -4,7 +4,7 @@ import { itemNames } from './inventory-page';
 export async function checkIfItemsAreInCart(page: Page): Promise<void> {
     if (itemNames.length > 0) {
         const elementHandles = await page.$$(
-            "//div[@class='inventory_item_name']"
+            "//div[@class='inventory_item_name ']"
         );
         const elementsArray: (string | null)[] = [];
         for (const elementHandle of elementHandles) {
