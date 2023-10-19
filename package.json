@@ -4,7 +4,7 @@
     "description": "",
     "main": "index.js",
     "scripts": {
-        "test": "npx playwright test ",
+        "test": "npx playwright test --trace on",
         "test-ui": "npx playwright test --ui",
         "test-headed": "npx playwright test --headed",
         "test-ui-headed": "npx playwright test --ui --headed"
