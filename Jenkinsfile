@@ -2,7 +2,11 @@ pipeline {
     agent any 
 
     stages {
-        // ... other stages
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
 
         stage('Run Playwright tests in Docker') {
             steps {
@@ -15,19 +19,22 @@ pipeline {
                                bash -c "npm install && npm test"
                 '''
             }
+            post {
+                always {
+                    script {
+                        if (currentBuild.result == 'FAILURE' || currentBuild.result == null) {
+                            currentBuild.result = 'UNSTABLE'
+                        }
+                    }
+                }
+            }
         }
 
         stage('Archive and Display Reports') {
             steps {
+                // Your archiving and report displaying steps here
                 archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
-                publishHTML(target: [
-                    allowMissing: true,
-                    alwaysLinkToLastBuild: true,
-                    keepAll: true,
-                    reportDir: 'playwright-report',
-                    reportFiles: 'index.html',
-                    reportName: 'Playwright Report'
-                ])
+                // Other steps to display or process the reports as needed
             }
         }
     }
