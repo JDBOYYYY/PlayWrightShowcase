@@ -8,12 +8,6 @@ pipeline {
             }
         }
 
-        stage('Install dependencies') {
-            steps {
-                sh 'npm install'
-            }
-        }
-
         stage('Run Playwright tests in Docker') {
             steps {
                 sh '''
@@ -22,7 +16,7 @@ pipeline {
                                -v $(pwd):/workspace \
                                -w /workspace \
                                mcr.microsoft.com/playwright:v1.39.0-jammy \
-                               bash -c "npm test"
+                               bash -c "npm install && npm test"
                 '''
             }
         }
