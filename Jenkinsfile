@@ -2,11 +2,7 @@ pipeline {
     agent any 
 
     stages {
-        stage('Checkout') {
-            steps {
-                checkout scm
-            }
-        }
+        // ... other stages
 
         stage('Run Playwright tests in Docker') {
             steps {
@@ -18,6 +14,20 @@ pipeline {
                                mcr.microsoft.com/playwright:v1.39.0-jammy \
                                bash -c "npm install && npm test"
                 '''
+            }
+        }
+
+        stage('Archive and Display Reports') {
+            steps {
+                archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
+                publishHTML(target: [
+                    allowMissing: true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll: true,
+                    reportDir: 'playwright-report',
+                    reportFiles: 'index.html',
+                    reportName: 'Playwright Report'
+                ])
             }
         }
     }
