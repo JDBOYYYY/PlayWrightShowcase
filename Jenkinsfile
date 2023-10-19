@@ -29,7 +29,7 @@ pipeline {
 
         stage('Archive and Display Reports') {
             steps {
-                archiveArtifacts artifacts: 'playwright-report/**', allowEmptyArchive: true
+                archiveArtifacts artifacts: '**/playwright-report/**, **/test-results/**', allowEmptyArchive: true
                 // If you have the HTML Publisher Plugin
                 publishHTML([allowMissing: true, alwaysLinkToLastBuild: true, keepAll: true, reportDir: 'playwright-report', reportFiles: 'index.html', reportName: 'Playwright Report', reportTitles: ''])
             }
