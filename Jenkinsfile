@@ -21,9 +21,9 @@ pipeline {
                 script {
                     sh """
                     docker run --rm --ipc=host \\
-                    -v ${env.TEST_RESULTS_VOLUME}:${env.WORKSPACE_DIR} \\
-                    -v ${WORKSPACE}:${env.WORKSPACE_DIR} \\
-                    -w ${env.WORKSPACE_DIR} \\
+                    -v ${env.TEST_RESULTS_VOLUME}:/test_results \\
+                    -v ${WORKSPACE}:/jenkins_workspace \\
+                    -w /jenkins_workspace \\
                     mcr.microsoft.com/playwright:v1.39.0-jammy \\
                     bash -c \\
                     "set -e;
@@ -34,14 +34,14 @@ pipeline {
                     echo 'Starting npm install';
                     npm install;
                     echo 'Starting npm test';
-                    npm test > test_output.log 2>&1 || true; # we allow tests to fail to proceed to report generation
+                    npm test > /test_results/test_output.log 2>&1 || true; # we allow tests to fail to proceed to report generation
                     echo 'Generating Allure report';
-                    allure generate --clean -o ${env.WORKSPACE_DIR}/allure-report ${env.WORKSPACE_DIR}/allure-results;
+                    allure generate --clean -o /test_results/allure-report /test_results/allure-results;
                     "
                     """
                 }
             }
-        }
+        }       
     }
     post {
         always {
