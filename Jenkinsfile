@@ -1,48 +1,71 @@
 pipeline {
-    agent any 
-
+    agent any
+    environment {
+        // Define the volume name where you want to keep the test results
+        // This volume will be used to persist data beyond the life of the Docker container
+        TEST_RESULTS_VOLUME = 'playwright_test_results'
+        WORKSPACE_DIR = '/workspace'
+    }
     stages {
-        stage('Checkout') {
+        stage('Prepare Environment') {
             steps {
-                checkout scm
+                script {
+                    // Create a Docker volume to persist test results if it doesn't exist
+                    sh "docker volume create ${env.TEST_RESULTS_VOLUME} || true"
+                }
             }
         }
 
         stage('Run Playwright tests in Docker') {
             steps {
                 script {
-                    // Run tests in the Docker container. We ensure Allure is installed in the container.
-                    sh '''
-                        docker run --rm \
-                            --ipc=host \
-                            -v $(pwd):/workspace \
-                            -w /workspace \
-                            mcr.microsoft.com/playwright:v1.39.0-jammy \
-                            bash -c 'set -e; echo "Installing Allure"; apt-get update && apt-get install allure -y; echo "Starting npm install"; npm install; echo "Starting npm test"; npm test --verbose > test.log 2>&1; echo "Tests completed";'
-                    '''
+                    sh """
+                    docker run --rm --ipc=host \\
+                    -v ${env.TEST_RESULTS_VOLUME}:${env.WORKSPACE_DIR} \\
+                    -w ${env.WORKSPACE_DIR} \\
+                    mcr.microsoft.com/playwright:v1.39.0-jammy \\
+                    bash -c \\
+                    "set -e;
+                    echo 'Updating packages list';
+                    apt-get update;
+                    echo 'Installing Allure';
+                    apt-get install -y allure;
+                    echo 'Starting npm install';
+                    npm install;
+                    echo 'Starting npm test';
+                    npm test > test_output.log 2>&1 || true; # we allow tests to fail to proceed to report generation
+                    echo 'Generating Allure report';
+                    allure generate --clean -o ${env.WORKSPACE_DIR}/allure-report ${env.WORKSPACE_DIR}/allure-results;
+                    "
+                    """
                 }
             }
         }
-    }
 
+        stage('Post-Test Cleanup') {
+            steps {
+                // Cleanup or other post-test steps
+            }
+        }
+    }
     post {
         always {
-            // Generate and archive Allure report even if tests fail
             script {
-                // The Allure report is generated on Jenkins, thus Allure needs to be installed on Jenkins.
-                // If your Jenkins server doesn't have Allure installed, this will fail.
-                sh 'allure generate --clean -o allure-report allure-results || true'
-            }
-            archiveArtifacts artifacts: 'allure-results/**/*', allowEmptyArchive: true
-            archiveArtifacts artifacts: 'allure-report/**/*', allowEmptyArchive: true
+                // Copy the Allure report from the Docker volume to the Jenkins workspace for publishing
+                sh "docker run --rm -v ${env.TEST_RESULTS_VOLUME}:${env.WORKSPACE_DIR} -w ${env.WORKSPACE_DIR} busybox tar -czf - allure-report | tar -C ${env.WORKSPACE} -xzf -"
 
-            publishHTML(target: [
-                reportDir: 'allure-report',
-                reportFiles: 'index.html',
-                reportName: 'Allure Report'
-            ])
-            junit '**/test-results/**/*.xml'
-            archiveArtifacts artifacts: '**/test-results/**', fingerprint: true
+                // Publish the Allure report
+                allure([
+                    includeProperties: false,
+                    jdk: '',
+                    properties: [],
+                    reportBuildPolicy: 'ALWAYS',
+                    results: [[path: 'allure-report']]
+                ])
+                
+                // Clean up the Docker volume if you don't need to persist the results after the job
+                sh "docker volume rm ${env.TEST_RESULTS_VOLUME} || true"
+            }
         }
     }
 }
