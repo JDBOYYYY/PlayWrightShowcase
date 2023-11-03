@@ -17,7 +17,7 @@ pipeline {
                             -v $(pwd):/workspace \
                             -w /workspace \
                             mcr.microsoft.com/playwright:v1.39.0-jammy \
-                            bash -c "npm install && npm test && npx junit-reporter --results 'test-results/**/*.xml' --savePath 'test-results/' && npx junit2html 'test-results/**/*.xml' 'test-results/index.html'"
+                            bash -c "npm install && npm test && npx junit-reporter --results 'test-results/**/*.xml' --savePath 'test-results/' && junit-viewer --results='test-results/' --save='test-results/index.html'"
                     '''
                 }
             }
