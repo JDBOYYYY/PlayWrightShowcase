@@ -27,7 +27,7 @@ pipeline {
     post {
         always {
             junit '**/test-results/**/*.xml'
-            archiveArtifacts artifacts: 'trace/**', fingerprint: true
+            archiveArtifacts artifacts: '**/test-results/**', fingerprint: true
         }
     }
 }
