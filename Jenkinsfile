@@ -7,26 +7,18 @@ pipeline {
                 checkout scm
             }
         }
-        stage('Setup Allure') {
-            steps {
-                script {
-                    sh 'sudo apt-get update'
-                    sh 'sudo apt-get install allure -y' // Make sure to use the correct command to install Allure
-                }
-            }
-        }
 
         stage('Run Playwright tests in Docker') {
             steps {
                 script {
-                    // Note that we're removing the exit 1 on test failure.
+                    // Run tests in the Docker container. We ensure Allure is installed in the container.
                     sh '''
                         docker run --rm \
                             --ipc=host \
                             -v $(pwd):/workspace \
                             -w /workspace \
                             mcr.microsoft.com/playwright:v1.39.0-jammy \
-                            bash -c 'set -e; echo "Starting npm install"; npm install > install.log; echo "Starting npm test"; npm test --verbose > test.log 2>&1; echo "Tests completed";'
+                            bash -c 'set -e; echo "Installing Allure"; apt-get update && apt-get install allure -y; echo "Starting npm install"; npm install; echo "Starting npm test"; npm test --verbose > test.log 2>&1; echo "Tests completed";'
                     '''
                 }
             }
@@ -37,6 +29,8 @@ pipeline {
         always {
             // Generate and archive Allure report even if tests fail
             script {
+                // The Allure report is generated on Jenkins, thus Allure needs to be installed on Jenkins.
+                // If your Jenkins server doesn't have Allure installed, this will fail.
                 sh 'allure generate --clean -o allure-report allure-results || true'
             }
             archiveArtifacts artifacts: 'allure-results/**/*', allowEmptyArchive: true
