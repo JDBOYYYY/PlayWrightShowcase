@@ -17,7 +17,7 @@ pipeline {
                             -v $(pwd):/workspace \
                             -w /workspace \
                             mcr.microsoft.com/playwright:v1.39.0-jammy \
-                            bash -c "set -e; npm install; npm test; npx junit-reporter --results 'test-results/**/*.xml' --savePath 'test-results/'; npm install -g junit-viewer && junit-viewer --results='test-results/' --save='test-results/index.html' || echo 'Failed to install junit-viewer or generate HTML report'; ls -al test-results"
+                            bash -c 'set -e; npm install; npm test --verbose || { echo "Tests failed"; exit 1; }; ls -al test-results; npx junit-reporter --results "test-results/**/*.xml" --savePath "test-results/" || { echo "JUnit reporter failed"; exit 1; }; npm install -g junit-viewer && junit-viewer --results="test-results/" --save="test-results/index.html" || echo "Failed to generate HTML report"; ls -al test-results'
                     '''
                 }
             }
