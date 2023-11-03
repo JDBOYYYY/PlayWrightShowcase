@@ -30,12 +30,13 @@ pipeline {
                     echo 'Updating packages list';
                     apt-get update;
                     echo 'Installing Allure';
-                    DEBIAN_FRONTEND=noninteractive apt-get install -y allure;
+                    wget https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.17.2/allure-commandline-2.17.2.tgz -O allure.tgz;
+                    tar -zxvf allure.tgz -C /opt/;
+                    ln -s /opt/allure-2.17.2/bin/allure /usr/bin/allure;
+                    echo 'Checking Allure installation';
+                    /usr/bin/allure --version || echo 'Allure command not found';
                     echo 'Starting npm install';
                     npm install;
-                    echo 'Checking Allure installation';
-                    dpkg -L allure;
-                    /usr/bin/allure --version || echo 'Allure command not found';
                     echo 'Starting npm test';
                     npm test > /test_results/test_output.log 2>&1 || true; # we allow tests to fail to proceed to report generation
                     echo 'Generating Allure report';
