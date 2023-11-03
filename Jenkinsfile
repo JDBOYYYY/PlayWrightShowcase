@@ -33,18 +33,18 @@ pipeline {
                     DEBIAN_FRONTEND=noninteractive apt-get install -y allure;
                     echo 'Starting npm install';
                     npm install;
-                    echo 'Checking Allure installation'
-                    which allure || echo 'Allure not found in PATH'
-                    allure --version || echo 'Allure command not found'
+                    echo 'Checking Allure installation';
+                    dpkg -L allure;
+                    /usr/bin/allure --version || echo 'Allure command not found';
                     echo 'Starting npm test';
                     npm test > /test_results/test_output.log 2>&1 || true; # we allow tests to fail to proceed to report generation
                     echo 'Generating Allure report';
-                    allure generate --clean -o /test_results/allure-report /test_results/allure-results;
+                    /usr/bin/allure generate --clean -o /test_results/allure-report /test_results/allure-results;
                     "
                     """
                 }
             }
-        }       
+        }
     }
     post {
         always {
