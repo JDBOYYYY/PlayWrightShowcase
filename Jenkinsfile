@@ -22,6 +22,7 @@ pipeline {
                     sh """
                     docker run --rm --ipc=host \\
                     -v ${env.TEST_RESULTS_VOLUME}:${env.WORKSPACE_DIR} \\
+                    -v ${WORKSPACE}:${env.WORKSPACE_DIR} \\
                     -w ${env.WORKSPACE_DIR} \\
                     mcr.microsoft.com/playwright:v1.39.0-jammy \\
                     bash -c \\
@@ -41,12 +42,6 @@ pipeline {
                 }
             }
         }
-
-        // stage('Post-Test Cleanup') {
-        //     steps {
-        //         // Cleanup or other post-test steps
-        //     }
-        // }
     }
     post {
         always {
@@ -54,15 +49,20 @@ pipeline {
                 // Copy the Allure report from the Docker volume to the Jenkins workspace for publishing
                 sh "docker run --rm -v ${env.TEST_RESULTS_VOLUME}:${env.WORKSPACE_DIR} -w ${env.WORKSPACE_DIR} busybox tar -czf - allure-report | tar -C ${env.WORKSPACE} -xzf -"
 
-                // Publish the Allure report
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    properties: [],
-                    reportBuildPolicy: 'ALWAYS',
-                    results: [[path: 'allure-report']]
-                ])
-                
+                // Check if the allure-report directory exists before attempting to publish it
+                if (fileExists("${WORKSPACE}/allure-report")) {
+                    // Publish the Allure report
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        properties: [],
+                        reportBuildPolicy: 'ALWAYS',
+                        results: [[path: 'allure-report']]
+                    ])
+                } else {
+                    echo "No allure-report directory found, skipping report publishing."
+                }
+
                 // Clean up the Docker volume if you don't need to persist the results after the job
                 sh "docker volume rm ${env.TEST_RESULTS_VOLUME} || true"
             }
