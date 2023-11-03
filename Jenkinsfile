@@ -30,7 +30,7 @@ pipeline {
                     echo 'Updating packages list';
                     apt-get update;
                     echo 'Installing Allure';
-                    apt-get install -y allure;
+                    DEBIAN_FRONTEND=noninteractive apt-get install -y allure;
                     echo 'Starting npm install';
                     npm install;
                     echo 'Checking Allure installation'
