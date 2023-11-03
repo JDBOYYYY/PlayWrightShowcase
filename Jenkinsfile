@@ -7,6 +7,14 @@ pipeline {
                 checkout scm
             }
         }
+        stage('Setup Allure') {
+            steps {
+                script {
+                    sh 'sudo apt-get update'
+                    sh 'sudo apt-get install allure -y' // Make sure to use the correct command to install Allure
+                }
+            }
+        }
 
         stage('Run Playwright tests in Docker') {
             steps {
