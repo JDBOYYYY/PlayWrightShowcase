@@ -20,11 +20,13 @@ pipeline {
                             bash -c "npm install && npm test"
                         '''
                 }
-            post {
-                always {
-                    junit 'results.xml'
-                    archiveArtifacts artifacts: 'trace/**', fingerprint: true
+                post {
+                    always {
+                        junit 'results.xml'
+                        archiveArtifacts artifacts: 'trace/**', fingerprint: true
+                    }
                 }
             }
         }
+    }
 }
