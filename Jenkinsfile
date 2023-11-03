@@ -29,6 +29,10 @@ pipeline {
                     "set -e;
                     echo 'Updating packages list';
                     apt-get update;
+                    echo 'Installing Java';
+                    apt-get install -y openjdk-11-jdk; # You can choose the version of Java that is compatible with Allure
+                    export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64; # Set JAVA_HOME appropriately for the installed Java version
+                    export PATH=\$PATH:\$JAVA_HOME/bin;
                     echo 'Installing Allure';
                     wget https://repo.maven.apache.org/maven2/io/qameta/allure/allure-commandline/2.17.2/allure-commandline-2.17.2.tgz -O allure.tgz;
                     tar -zxvf allure.tgz -C /opt/;
