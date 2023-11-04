@@ -57,10 +57,10 @@ pipeline {
         always {
             script {
                 // Copy the Allure report from the Docker volume to the Jenkins workspace for publishing
-                sh "docker run --rm -v ${env.TEST_RESULTS_VOLUME}:${env.WORKSPACE_DIR} -w ${env.WORKSPACE_DIR} busybox tar -czf - allure-report | tar -C ${env.WORKSPACE} -xzf -"
+                sh "docker run --rm -v ${env.TEST_RESULTS_VOLUME}:${env.WORKSPACE_DIR} -w ${env.WORKSPACE_DIR} busybox tar -czf - allure-report | tar -C ${env.WORKSPACE}/test_results -xzf -"
 
                 // Check if the allure-report directory exists before attempting to publish it
-                if (fileExists("${WORKSPACE}/allure-report")) {
+                if (fileExists("${WORKSPACE}/test_results/allure-report")) {
                     // Publish the Allure report
                     allure([
                         includeProperties: false,
