@@ -18,8 +18,7 @@ pipeline {
                     -v $(pwd):/workspace \
                     -w /workspace \
                     mcr.microsoft.com/playwright:v1.39.0-jammy \
-                    sh 'chmod -R 777 allure-results'
-                    bash -c "npm install && npx playwright test && allure generate allure-results --clean -o allure-report || true"
+                    bash -c "chmod -R 777 allure-results && npm install && npx playwright test && allure generate allure-results --clean -o allure-report || true"
                 '''
             }
         }
