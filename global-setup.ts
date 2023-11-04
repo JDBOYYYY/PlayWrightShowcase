@@ -24,6 +24,13 @@ test.afterEach(async ({ page }, testInfo) => {
                 });
             }
         }
+        const publicTraceUrl = 'https://yourstorage/path/to/trace.zip'; // Replace with your actual URL
+
+        // Attach the URL as a link to the Allure report
+        await testInfo.attach('View Trace', { // This is the name that will be displayed
+            body: publicTraceUrl,
+            contentType: 'text/plain', // Use text/plain if it's just a simple URL
+        });
     }
 });
 
