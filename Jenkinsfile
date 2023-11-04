@@ -11,14 +11,14 @@ pipeline {
 
         stage('Run Playwright tests in Docker') {
             steps {
-                script {
-                    docker.image('mcr.microsoft.com/playwright:v1.20.0-focal').inside('-v /home/szimonczyk/.npm:/root/.npm') {
-                        // Install dependencies and run tests
-                        sh 'npm install'
-                        sh 'npx playwright test'
-                        sh 'allure generate allure-results --clean -o allure-report || true'
-                    }
-                }
+                sh '''
+                docker run --rm \
+                    --ipc=host \
+                    -v $(pwd):/workspace \
+                    -w /workspace \
+                    mcr.microsoft.com/playwright:v1.20.0-focal \
+                    bash -c "npm install && npx playwright test && allure generate allure-results --clean -o allure-report || true"
+                '''
             }
         }
     }
@@ -26,20 +26,25 @@ pipeline {
     post {
         always {
             script {
-                allure([
-                    includeProperties: false,
-                    jdk: '',
-                    properties: [],
-                    reportBuildPolicy: 'ALWAYS',
-                    results: [[path: 'allure-report']]
-                ])
+                // Generate and archive allure reports even if the tests fail
+                if (fileExists('allure-results')) {
+                    allure([
+                        includeProperties: false,
+                        jdk: '',
+                        properties: [],
+                        reportBuildPolicy: 'ALWAYS',
+                        results: [[path: 'allure-results']]
+                    ])
+                }
 
                 // Archive the Allure report
-                archiveArtifacts artifacts: 'allure-report/**', fingerprint: true
-            }
+                if (fileExists('allure-report')) {
+                    archiveArtifacts artifacts: 'allure-report/**', fingerprint: true
+                }
 
-            // Clean up the workspace
-            cleanWs()
+                // Clean up the workspace
+                cleanWs()
+            }
         }
     }
 }
