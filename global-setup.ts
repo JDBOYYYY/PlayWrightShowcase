@@ -4,7 +4,7 @@ export const test = base.extend({
     // Define any additional fixtures if necessary
 });
 
-test.afterEach(async ({ testInfo }) => {
+test.afterEach(async ({ page }, testInfo) => {
     if (testInfo.status === 'failed') {
         // Attach trace
         const tracePath = await testInfo.outputPath('trace.zip');
