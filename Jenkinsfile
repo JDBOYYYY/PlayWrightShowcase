@@ -15,7 +15,7 @@ pipeline {
                     docker.image('mcr.microsoft.com/playwright:v1.20.0-focal').inside('-v /local/path/to/npm/cache:/root/.npm') {
                         // Install dependencies and run tests
                         sh 'npm install'
-                        sh 'npx playwright test --reporter=line,allure-playwright'
+                        sh 'npx playwright test'
                         sh 'allure generate allure-results --clean -o allure-report || true'
                     }
                 }
