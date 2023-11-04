@@ -12,7 +12,7 @@ pipeline {
         stage('Run Playwright tests in Docker') {
             steps {
                 script {
-                    docker.image('mcr.microsoft.com/playwright:v1.20.0-focal').inside {
+                    docker.image('mcr.microsoft.com/playwright:v1.20.0-focal').inside('-v /local/path/to/npm/cache:/root/.npm') {
                         // Install dependencies and run tests
                         sh 'npm install'
                         sh 'npx playwright test --reporter=line,allure-playwright'
