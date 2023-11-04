@@ -12,11 +12,13 @@ pipeline {
         stage('Run Playwright tests in Docker') {
             steps {
                 sh '''
+                docker pull mcr.microsoft.com/playwright:v1.39.0-jammy
                 docker run --rm \
                     --ipc=host \
                     -v $(pwd):/workspace \
                     -w /workspace \
-                    docker pull mcr.microsoft.com/playwright:v1.39.0-jammy
+                    mcr.microsoft.com/playwright:v1.39.0-jammy \
+                    sh 'chmod -R 777 allure-results'
                     bash -c "npm install && npx playwright test && allure generate allure-results --clean -o allure-report || true"
                 '''
             }
