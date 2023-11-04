@@ -12,7 +12,7 @@ import { checkIfItemsAreInCart } from '../pages/cart-page';
 import { fillCheckoutStepOne } from '../pages/checkout-step-one-page';
 import { checkPrices } from '../pages/checkout-step-two-page';
 
-test.only('Check Login ', async ({ page }) => {
+test('Check Login ', async ({ page }) => {
     await page.goto('https://www.saucedemo.com/');
     await login(page, 'x', 'secret_sauce');
     await expect(await page.locator('[data-test="error"]')).toContainText(
