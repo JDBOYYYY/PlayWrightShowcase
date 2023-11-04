@@ -16,8 +16,8 @@ pipeline {
                     --ipc=host \
                     -v $(pwd):/workspace \
                     -w /workspace \
-                    mcr.microsoft.com/playwright:v1.39.0-jammy \
-                    bash -c "npm install && npx playwright test && allure generate allure-results --clean -o allure-report || true"
+                    mcr.microsoft.com/playwright:v1.20.0-focal \
+                    bash -c "npm install && npx playwright install && npx playwright test && allure generate allure-results --clean -o allure-report || true"
                 '''
             }
         }
