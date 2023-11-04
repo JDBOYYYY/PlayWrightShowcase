@@ -43,8 +43,10 @@ pipeline {
                     npm install;
                     echo 'Starting npm test';
                     npm test > /test_results/test_output.log 2>&1 || true; # we allow tests to fail to proceed to report generation
+                    # Make sure the directory for allure-results exists
+                    mkdir -p /test_results/allure-results
                     echo 'Generating Allure report';
-                    /usr/bin/allure generate --clean -o /test-results/allure-report /test-results/allure-results;
+                    /usr/bin/allure generate --clean -o /test_results/allure-report /test_results/allure-results;
                     "
                     """
                 }
