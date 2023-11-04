@@ -9,6 +9,16 @@ pipeline {
             }
         }
 
+        stage('Prepare Allure Results Directory') {
+            steps {
+                script {
+                    if (!fileExists('allure-results')) {
+                        sh 'mkdir -p allure-results && chmod -R 777 allure-results'
+                    }
+                }
+            }
+        }
+
         stage('Run Playwright tests in Docker') {
             steps {
                 sh '''
@@ -18,7 +28,7 @@ pipeline {
                     -v $(pwd):/workspace \
                     -w /workspace \
                     mcr.microsoft.com/playwright:v1.39.0-jammy \
-                    bash -c "chmod -R 777 allure-results && npm install && npx playwright test && allure generate allure-results --clean -o allure-report || true"
+                    bash -c "npm install && npx playwright test && allure generate allure-results --clean -o allure-report || true"
                 '''
             }
         }
