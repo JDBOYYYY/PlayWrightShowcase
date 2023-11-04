@@ -14,7 +14,6 @@ pipeline {
                 sh '''
                 docker run --rm \
                     --ipc=host \
-                    -v /home/szimonczyk/.npm:/root/.npm \
                     -v $(pwd):/workspace \
                     -w /workspace \
                     docker pull mcr.microsoft.com/playwright:v1.39.0-jammy
