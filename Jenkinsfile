@@ -13,9 +13,8 @@ pipeline {
             steps {
                 script {
                     docker.image('mcr.microsoft.com/playwright:v1.20.0-focal').inside {
-                        // Install dependencies
+                        // Install dependencies and run tests
                         sh 'npm install'
-                        // Run Playwright tests
                         sh 'npx playwright test --reporter=line,allure-playwright'
                     }
                 }
@@ -25,12 +24,14 @@ pipeline {
 
     post {
         always {
-            // Generate and publish the Allure report
-            docker.image('mcr.microsoft.com/playwright:v1.20.0-focal').inside {
-                // Generate the Allure report
-                sh 'allure generate allure-results --clean -o allure-report || true'
+            script {
+                // Using the same Docker image for consistency
+                docker.image('mcr.microsoft.com/playwright:v1.20.0-focal').inside {
+                    // Generate Allure report
+                    sh 'allure generate allure-results --clean -o allure-report || true'
+                }
 
-                // Publish the Allure report using the Jenkins Allure plugin
+                // Publish Allure report - assumes Allure plugin is installed
                 allure([
                     includeProperties: false,
                     jdk: '',
@@ -39,13 +40,12 @@ pipeline {
                     results: [[path: 'allure-report']]
                 ])
 
-                // Archive the Allure results and report
+                // Archive the Allure report
                 archiveArtifacts artifacts: 'allure-report/**', fingerprint: true
             }
 
-            // Clean up the workspace to not affect future builds
+            // Clean up the workspace
             cleanWs()
         }
     }
-    
 }
