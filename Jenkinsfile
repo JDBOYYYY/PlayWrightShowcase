@@ -12,7 +12,7 @@ pipeline {
         stage('Run Playwright tests in Docker') {
             steps {
                 script {
-                    docker.image('mcr.microsoft.com/playwright:v1.20.0-focal').inside('-v /local/path/to/npm/cache:/root/.npm') {
+                    docker.image('mcr.microsoft.com/playwright:v1.20.0-focal').inside('-v /home/szimonczyk/.npm') {
                         // Install dependencies and run tests
                         sh 'npm install'
                         sh 'npx playwright test'
