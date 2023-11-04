@@ -14,10 +14,11 @@ pipeline {
                 sh '''
                 docker run --rm \
                     --ipc=host \
+                    -v /home/szimonczyk/.npm:/root/.npm \
                     -v $(pwd):/workspace \
                     -w /workspace \
-                    mcr.microsoft.com/playwright:v1.20.0-focal \
-                    bash -c "npm install && npx playwright install && npx playwright test && allure generate allure-results --clean -o allure-report || true"
+                    docker pull mcr.microsoft.com/playwright:v1.39.0-jammy
+                    bash -c "npm install && npx playwright test && allure generate allure-results --clean -o allure-report || true"
                 '''
             }
         }
