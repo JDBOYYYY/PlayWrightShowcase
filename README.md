@@ -1,4 +1,6 @@
-# Szymon showcase Playwright Test Project
+# Szymon showcase Playwright Test Project Jenskins 
+![SwipingJenkinsCiGIF](https://github.com/JDBOYYYY/PlayWrightShowcase/assets/26493689/8007ac39-2574-4700-9299-f2d2024e9cb8)
+
 
 This project utilizes [Playwright Test](https://playwright.dev/docs/test-intro), a part of the Playwright ecosystem, to run browser tests with various configurations including with UI and in headed or headless modes. You can toggle between these configurations using the npm scripts provided in the `package.json` file.
 
